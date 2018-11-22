@@ -32,5 +32,4 @@ weight file and put it in `data/weight`
 
 ### Requirements
 1. Tensorflow
-
 2. OpenCV
