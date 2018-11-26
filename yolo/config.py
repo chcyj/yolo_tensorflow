@@ -6,21 +6,20 @@ import os
 
 DATA_PATH = 'data'
 
-PASCAL_PATH = os.path.join(DATA_PATH, 'pascal_voc')
+#PASCAL_PATH = os.path.join(DATA_PATH, 'pascal_voc')
 
-CACHE_PATH = os.path.join(PASCAL_PATH, 'cache')
+MPHB_PATH = os.path.join(DATA_PATH,'MPHB')
 
-OUTPUT_DIR = os.path.join(PASCAL_PATH, 'output')
+CACHE_PATH = os.path.join(MPHB_PATH, 'cache')
 
-WEIGHTS_DIR = os.path.join(PASCAL_PATH, 'weights')
+OUTPUT_DIR = os.path.join(MPHB_PATH, 'output')
+
+WEIGHTS_DIR = os.path.join(MPHB_PATH, 'weights')
 
 WEIGHTS_FILE = None
 # WEIGHTS_FILE = os.path.join(DATA_PATH, 'weights', 'YOLO_small.ckpt')
 
-CLASSES = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
-           'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse',
-           'motorbike', 'person', 'pottedplant', 'sheep', 'sofa',
-           'train', 'tvmonitor']
+CLASSES = ['__backgroud__','bent', 'kneeling', 'lying', 'sitting', 'upright', 'partial']
 
 FLIPPED = True
 
