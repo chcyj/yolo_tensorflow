@@ -11,7 +11,6 @@ slim = tf.contrib.slim
 
 
 class Solver(object):
-
     def __init__(self, net, data):
         self.net = net
         self.data = data
