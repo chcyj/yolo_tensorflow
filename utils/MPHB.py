@@ -120,9 +120,9 @@ class mphb(object):
 
         label = np.zeros((self.cell_size, self.cell_size, 25))
         filename = os.path.join(self.data_path, 'MPHB-label-txt','MPHB-label-with-category-info.txt')
-        file = open(filename, 'r')
+        f=open(filename, 'r')
         annotation_content=file.readlines()
-        file.close()
+        f.close()
         objs=[]
         line_num=0
         while True:
@@ -142,16 +142,21 @@ class mphb(object):
             line_num += 1
         num_objs=len(objs)
         ''' tree = ET.parse(filename)
-        objs = tree.findall('object')
+        objs = tree.findall('object')'''
 
         for obj in objs:
-            bbox = obj.find('bndbox')
+            '''bbox = obj.find('bndbox')
             # Make pixel indexes 0-based
             x1 = max(min((float(bbox.find('xmin').text) - 1) * w_ratio, self.image_size - 1), 0)
             y1 = max(min((float(bbox.find('ymin').text) - 1) * h_ratio, self.image_size - 1), 0)
             x2 = max(min((float(bbox.find('xmax').text) - 1) * w_ratio, self.image_size - 1), 0)
-            y2 = max(min((float(bbox.find('ymax').text) - 1) * h_ratio, self.image_size - 1), 0)
-            cls_ind = self.class_to_ind[obj.find('name').text.lower().strip()]
+            y2 = max(min((float(bbox.find('ymax').text) - 1) * h_ratio, self.image_size - 1), 0)'''
+            x1 = float(objs[ix][0])
+            y1 = float(objs[ix][1])
+            x2 = float(objs[ix][2])
+            y2 = float(objs[ix][3])
+           #cls_ind = self.class_to_ind[obj.find('name').text.lower().strip()]
+            cls_ind = self.class_to_ind[label.lower().strip()]
             boxes = [(x2 + x1) / 2.0, (y2 + y1) / 2.0, x2 - x1, y2 - y1]
             x_ind = int(boxes[0] * self.cell_size / self.image_size)
             y_ind = int(boxes[1] * self.cell_size / self.image_size)
@@ -161,4 +166,5 @@ class mphb(object):
             label[y_ind, x_ind, 1:5] = boxes
             label[y_ind, x_ind, 5 + cls_ind] = 1
 
-        return label, len(objs)'''
+        #return label, len(objs)
+        return label, num_objs
