@@ -112,11 +112,6 @@ class mphb(object):
         return gt_labels
 
     def load_mphb_annotation(self, index):
-        """
-        Load image and bounding boxes info from XML file in the PASCAL VOC
-        format.
-        """
-
         imname = os.path.join(self.data_path, 'Human Body Image', index + '.jpg')
         im = cv2.imread(imname)
         h_ratio = 1.0 * self.image_size / im.shape[0]
