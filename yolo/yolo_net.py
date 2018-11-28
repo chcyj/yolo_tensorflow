@@ -109,7 +109,7 @@ class YOLONet(object):
                     net, num_outputs, activation_fn=None, scope='fc_36')
         return net
 
-   def calc_iou(self, boxes1, boxes2, scope='iou'):
+    def calc_iou(self, boxes1, boxes2, scope='iou'):
         """calculate ious
         Args:
           boxes1: 5-D tensor [BATCH_SIZE, CELL_SIZE, CELL_SIZE, BOXES_PER_CELL, 4]  ====> (x_center, y_center, w, h)

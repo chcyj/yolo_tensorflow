@@ -5,7 +5,8 @@ import tensorflow as tf
 import yolo.config as cfg
 from yolo.yolo_net import YOLONet
 from utils.timer import Timer
-from utils.pascal_voc import pascal_voc
+#from utils.pascal_voc import pascal_voc
+from utils.MPHB import mphb as mp
 
 slim = tf.contrib.slim
 
@@ -122,10 +123,14 @@ class Solver(object):
 
 def update_config_paths(data_dir, weights_file):
     cfg.DATA_PATH = data_dir
-    cfg.PASCAL_PATH = os.path.join(data_dir, 'pascal_voc')
+    '''cfg.PASCAL_PATH = os.path.join(data_dir, 'pascal_voc')
     cfg.CACHE_PATH = os.path.join(cfg.PASCAL_PATH, 'cache')
     cfg.OUTPUT_DIR = os.path.join(cfg.PASCAL_PATH, 'output')
-    cfg.WEIGHTS_DIR = os.path.join(cfg.PASCAL_PATH, 'weights')
+    cfg.WEIGHTS_DIR = os.path.join(cfg.PASCAL_PATH, 'weights')'''
+    cfg.MPHB_PATH = os.path.join(data_dir, 'MPHB')
+    cfg.CACHE_PATH = os.path.join(cfg.MPHB_PATH, 'cache')
+    cfg.OUTPUT_DIR = os.path.join(cfg.MPHB_PATH, 'output')
+    cfg.WEIGHTS_DIR = os.path.join(cfg.MPHB_PATH, 'weights')
 
     cfg.WEIGHTS_FILE = os.path.join(cfg.WEIGHTS_DIR, weights_file)
 
@@ -148,9 +153,9 @@ def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = cfg.GPU
 
     yolo = YOLONet()
-    pascal = pascal_voc('train')
+    mphb = mp('train')
 
-    solver = Solver(yolo, pascal)
+    solver = Solver(yolo, mphb)
 
     print('Start training ...')
     solver.train()

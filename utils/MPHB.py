@@ -118,13 +118,14 @@ class mphb(object):
         w_ratio = 1.0 * self.image_size / im.shape[1]
         # im = cv2.resize(im, [self.image_size, self.image_size])
 
-        label = np.zeros((self.cell_size, self.cell_size, 25))
+        label = np.zeros((self.cell_size, self.cell_size, 12))
         filename = os.path.join(self.data_path, 'MPHB-label-txt','MPHB-label-with-category-info.txt')
         f=open(filename, 'r')
-        annotation_content=file.readlines()
+        annotation_content=f.readlines()
         f.close()
         objs=[]
         line_num=0
+        pose=''
         while True:
             line=annotation_content[line_num]
             if line[0:3]=='idx':
@@ -137,34 +138,39 @@ class mphb(object):
                         line_num += 1
                         line = annotation_content[line_num]
                     line_num+=1
-                    label = annotation_content[line_num]
+                    pose = annotation_content[line_num]
                     break
             line_num += 1
         num_objs=len(objs)
         ''' tree = ET.parse(filename)
         objs = tree.findall('object')'''
 
+        ix=0
         for obj in objs:
-            '''bbox = obj.find('bndbox')
+            # bbox = obj.find('bndbox')
             # Make pixel indexes 0-based
-            x1 = max(min((float(bbox.find('xmin').text) - 1) * w_ratio, self.image_size - 1), 0)
-            y1 = max(min((float(bbox.find('ymin').text) - 1) * h_ratio, self.image_size - 1), 0)
-            x2 = max(min((float(bbox.find('xmax').text) - 1) * w_ratio, self.image_size - 1), 0)
-            y2 = max(min((float(bbox.find('ymax').text) - 1) * h_ratio, self.image_size - 1), 0)'''
-            x1 = float(objs[ix][0])
+            x1 = max(min((float(objs[ix][0]) - 1) * w_ratio, self.image_size - 1), 0)
+            y1 = max(min((float(objs[ix][1]) - 1) * h_ratio, self.image_size - 1), 0)
+            x2 = max(min((float(objs[ix][2]) - 1) * w_ratio, self.image_size - 1), 0)
+            y2 = max(min((float(objs[ix][3]) - 1) * h_ratio, self.image_size - 1), 0)
+            '''x1 = float(objs[ix][0])
             y1 = float(objs[ix][1])
             x2 = float(objs[ix][2])
-            y2 = float(objs[ix][3])
-           #cls_ind = self.class_to_ind[obj.find('name').text.lower().strip()]
-            cls_ind = self.class_to_ind[label.lower().strip()]
+            y2 = float(objs[ix][3])'''
+            #cls_ind = self.class_to_ind[obj.find('name').text.lower().strip()]
+            cls_ind = self.class_to_ind[pose.lower().strip()]
             boxes = [(x2 + x1) / 2.0, (y2 + y1) / 2.0, x2 - x1, y2 - y1]
             x_ind = int(boxes[0] * self.cell_size / self.image_size)
             y_ind = int(boxes[1] * self.cell_size / self.image_size)
+            #print(x_ind)
+            #print(y_ind)
+            #print(label.shape)
             if label[y_ind, x_ind, 0] == 1:
                 continue
             label[y_ind, x_ind, 0] = 1
             label[y_ind, x_ind, 1:5] = boxes
             label[y_ind, x_ind, 5 + cls_ind] = 1
+            ix = ix + 1
 
         #return label, len(objs)
         return label, num_objs
