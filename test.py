@@ -53,9 +53,7 @@ class Detector(object):
         inputs = cv2.cvtColor(inputs, cv2.COLOR_BGR2RGB).astype(np.float32)
         inputs = (inputs / 255.0) * 2.0 - 1.0
         inputs = np.reshape(inputs, (1, self.image_size, self.image_size, 3))
-
         result = self.detect_from_cvmat(inputs)[0]
-
         for i in range(len(result)):
             result[i][1] *= (1.0 * img_w / self.image_size)
             result[i][2] *= (1.0 * img_h / self.image_size)
@@ -68,9 +66,11 @@ class Detector(object):
         net_output = self.sess.run(self.net.logits,
                                    feed_dict={self.net.images: inputs})
         results = []
+        #print(net_output.shape[0])
         for i in range(net_output.shape[0]):
+            #print(net_output[i])
             results.append(self.interpret_output(net_output[i]))
-
+        #print(results)
         return results
 
     def interpret_output(self, output):
@@ -93,32 +93,36 @@ class Detector(object):
                 [self.boxes_per_cell, self.cell_size, self.cell_size]),
             (1, 2, 0))
 
+        #print(class_probs,scales,boxes,offset)
         boxes[:, :, :, 0] += offset
         boxes[:, :, :, 1] += np.transpose(offset, (1, 0, 2))
         boxes[:, :, :, :2] = 1.0 * boxes[:, :, :, 0:2] / self.cell_size
         boxes[:, :, :, 2:] = np.square(boxes[:, :, :, 2:])
-
+        #print(boxes)
         boxes *= self.image_size
 
         for i in range(self.boxes_per_cell):
             for j in range(self.num_class):
                 probs[:, :, i, j] = np.multiply(
                     class_probs[:, :, j], scales[:, :, i])
-
+        #print(probs)
+        #print(self.threshold)
         filter_mat_probs = np.array(probs >= self.threshold, dtype='bool')
         filter_mat_boxes = np.nonzero(filter_mat_probs)
+        #print(filter_mat_probs)
         boxes_filtered = boxes[filter_mat_boxes[0],
                                filter_mat_boxes[1], filter_mat_boxes[2]]
         probs_filtered = probs[filter_mat_probs]
+        #print(boxes_filtered)
         classes_num_filtered = np.argmax(
             filter_mat_probs, axis=3)[
             filter_mat_boxes[0], filter_mat_boxes[1], filter_mat_boxes[2]]
-
+        #print(boxes_filtered)
         argsort = np.array(np.argsort(probs_filtered))[::-1]
         boxes_filtered = boxes_filtered[argsort]
         probs_filtered = probs_filtered[argsort]
         classes_num_filtered = classes_num_filtered[argsort]
-
+        #print(boxes_filtered)
         for i in range(len(boxes_filtered)):
             if probs_filtered[i] == 0:
                 continue
@@ -127,6 +131,7 @@ class Detector(object):
                     probs_filtered[j] = 0.0
 
         filter_iou = np.array(probs_filtered > 0.0, dtype='bool')
+        #print(boxes_filtered)
         boxes_filtered = boxes_filtered[filter_iou]
         probs_filtered = probs_filtered[filter_iou]
         classes_num_filtered = classes_num_filtered[filter_iou]
@@ -172,9 +177,10 @@ class Detector(object):
     def image_detector(self, imname, wait=0):
         detect_timer = Timer()
         image = cv2.imread(imname)
-
+        #print('image is',image)
         detect_timer.tic()
         result = self.detect(image)
+        #print('result is',result)
         detect_timer.toc()
         print('Average detecting time: {:.3f}s'.format(
             detect_timer.average_time))
@@ -187,15 +193,16 @@ class Detector(object):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', default="YOLO_small.ckpt", type=str)
-    parser.add_argument('--weight_dir', default='weights', type=str)
-    parser.add_argument('--data_dir', default="data", type=str)
+    #parser.add_argument('--weight_dir', default='weights', type=str)
+    #parser.add_argument('--data_dir', default="data", type=str)
     parser.add_argument('--gpu', default='', type=str)
     args = parser.parse_args()
 
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
     yolo = YOLONet(False)
-    weight_file = os.path.join(args.data_dir, args.weight_dir, args.weights)
+    #weight_file = os.path.join(args.data_dir, args.weight_dir, args.weights)
+    weight_file = os.path.join(args.weights)
     detector = Detector(yolo, weight_file)
 
     # detect from camera
@@ -203,7 +210,7 @@ def main():
     # detector.camera_detector(cap)
 
     # detect from image file
-    imname = 'test/person.jpg'
+    imname = 'test/03240.jpg'
     detector.image_detector(imname)
 
 

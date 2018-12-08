@@ -77,9 +77,7 @@ class Solver(object):
                         feed_dict=feed_dict)
                     train_timer.toc()
 
-                    log_str = '''{} Epoch: {}, Step: {}, Learning rate: {},'''
-                    ''' Loss: {:5.3f}\nSpeed: {:.3f}s/iter,'''
-                    '''' Load: {:.3f}s/iter, Remain: {}'''.format(
+                    log_str = '{} Epoch: {}, Step: {}, Learning rate: {},Loss: {:5.3f}\nSpeed: {:.3f}s/iter, Load : {:.3f}s/iter, Remain : {}'.format(
                         datetime.datetime.now().strftime('%m-%d %H:%M:%S'),
                         self.data.epoch,
                         int(step),
@@ -89,7 +87,6 @@ class Solver(object):
                         load_timer.average_time,
                         train_timer.remain(step, self.max_iter))
                     print(log_str)
-
                 else:
                     train_timer.tic()
                     summary_str, _ = self.sess.run(
@@ -98,7 +95,6 @@ class Solver(object):
                     train_timer.toc()
 
                 self.writer.add_summary(summary_str, step)
-
             else:
                 train_timer.tic()
                 self.sess.run(self.train_op, feed_dict=feed_dict)

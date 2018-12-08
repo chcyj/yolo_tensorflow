@@ -6,7 +6,6 @@ import pickle
 import copy
 import yolo.config as cfg
 
-
 class mphb(object):
     def __init__(self, phase, rebuild=False):
         #self.devkil_path = os.path.join(cfg.MPHB_PATH, 'VOCdevkiti')
@@ -29,7 +28,7 @@ class mphb(object):
         images = np.zeros(
             (self.batch_size, self.image_size, self.image_size, 3))
         labels = np.zeros(
-            (self.batch_size, self.cell_size, self.cell_size, 25))
+            (self.batch_size, self.cell_size, self.cell_size, 12))
         count = 0
         while count < self.batch_size:
             imname = self.gt_labels[self.cursor]['imname']
